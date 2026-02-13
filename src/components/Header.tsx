@@ -77,16 +77,6 @@ export default function Header() {
   return (
     <>
     <header className="sticky top-0 z-50 bg-white shadow-md">
-      
-      {/* TẦNG 1: TOP BAR (Giữ nguyên) */}
-      <div className="hidden md:block bg-brand-blue border-b border-blue-800 text-white text-xs py-2">
-        <div className="container mx-auto px-4 flex justify-between items-center">
-          <span>Chào mừng đến với Lâm Đồng Retail!!!</span>
-          <div className="flex gap-4">
-             <Link href="/hotro" className="hover:text-brand-orange transition-colors">Hỗ trợ</Link>
-          </div>
-        </div>
-      </div>
 
       {/* TẦNG 2: MAIN HEADER (Giữ nguyên) */}
       <div className="bg-brand-blue text-white py-3 md:py-4 shadow-lg">
@@ -215,13 +205,13 @@ export default function Header() {
                 <Link href="/about" className="hover:text-brand-blue">Về chúng tôi</Link>
             </li>
 
-            <li className="flex-shrink-0 md:hidden">
-                <Link href="/blog" className="hover:text-brand-blue">Tin tức</Link>
-            </li>
             <li className="flex-shrink-0">
                 <Link href="/lienhe" className="hover:text-brand-orange transition">
                     Liên hệ
                 </Link>
+            </li>
+            <li className="flex-shrink-0">
+            <Link href="/hotro" className="hover:text-brand-orange transition-colors">Hỗ trợ</Link>
             </li>
 
           </ul>
