@@ -1,65 +1,67 @@
-import Image from "next/image";
+import HeroSection from '@/components/HeroSection';
+import ProductCard from '@/components/ProductCard';
+import { ProductService } from '@/services/ProductService';
+import { ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+import HomePopup from '@/components/HomePopup';
 
-export default function Home() {
+export default async function Home() {
+  // 1. Gọi Data từ Service (Server Side Rendering)
+  const products = await ProductService.getDailyFeatured();
+  
+  // Tạm thời lấy categories (nếu cần hiển thị sau này)
+  // const categories = await ProductService.getCategories();
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="bg-gray-50 min-h-screen pb-20">
+      <HomePopup />
+      {/* 1. Banner quảng cáo lớn */}
+      <HeroSection />
+
+      {/* 2. Danh sách sản phẩm nổi bật */}
+      <section className="container mx-auto px-4 mt-12">
+        <div className="flex justify-between items-end mb-8">
+            <div>
+                <h2 className="text-3xl font-bold text-brand-blue mb-2">Sản phẩm nổi bật</h2>
+                <p className="text-gray-500">Đừng bỏ lỡ các ưu đãi hấp dẫn nhất trong ngày</p>
+            </div>
+            <Link href="/products" className="hidden md:flex items-center gap-1 text-brand-orange font-bold hover:underline">
+                Xem tất cả <ArrowRight className="w-4 h-4" />
+            </Link>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        
+        {/* Grid sản phẩm: Mobile 2 cột, PC 4 hoặc 5 cột */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+           {products.length > 0 ? (
+             products.map((product) => (
+               <ProductCard key={product.id} product={product} />
+             ))
+           ) : (
+             <p className="col-span-full text-center py-10 text-gray-500">
+               Chưa có sản phẩm nào. Hãy thêm trong Database nhé!
+             </p>
+           )}
         </div>
-      </main>
-    </div>
+      </section>
+
+      {/* 3. Section Gói Combo (Demo) */}
+      <section className="container mx-auto px-4 mt-20">
+         <div className="bg-brand-orange/5 rounded-2xl p-8 border border-brand-orange/10">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div>
+                    <h2 className="text-2xl font-bold text-brand-orange mb-2">⚡ Gói Tiết Kiệm Thông Minh</h2>
+                    <p className="text-gray-600">
+                        Mua theo combo các sản phẩm cận date để tiết kiệm tới 50% chi phí.
+                        Chung tay chống lãng phí thực phẩm!
+                    </p>
+                </div>
+                <Link href="/bundles" className="bg-brand-orange text-white px-6 py-3 rounded-full font-bold shadow-lg hover:bg-orange-600 transition whitespace-nowrap">
+                    Khám phá ngay
+                </Link>
+            </div>
+         </div>
+      </section>
+
+    </main>
   );
 }
