@@ -77,7 +77,7 @@ export default function Footer() {
       </div>
       
       <div className="border-t border-blue-800 pt-8 text-center text-xs text-blue-300">
-        &copy; 2026 Lam Dong Retail Store. Thiết kế bởi bé iu của Hyen.
+        &copy; 2026 Lam Dong Retail Store. Thiết kế bởi Hyen.
       </div>
     </footer>
   );

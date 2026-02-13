@@ -152,7 +152,7 @@ export default function ContactPage() {
                        </div>
                        <div>
                           <p className="text-xs opacity-70">Địa chỉ</p>
-                          <p className="font-medium">279 Nguyễn Tri Phương, Q.10, TP.HCM</p>
+                          <p className="font-medium">123 Đường Hùng Vương, Phường 9, TP. Đà Lạt, Lâm Đồng</p>
                        </div>
                     </div>
 
@@ -172,7 +172,7 @@ export default function ContactPage() {
                        </div>
                        <div>
                           <p className="text-xs opacity-70">Email</p>
-                          <p className="font-medium">support@athena.vn</p>
+                          <p className="font-medium">support@lamdongretail.com</p>
                        </div>
                     </div>
                  </div>
