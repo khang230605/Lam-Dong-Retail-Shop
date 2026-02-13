@@ -8,7 +8,7 @@ export default function Footer() {
         
         {/* Cột 1: Thông tin công ty */}
         <div>
-          <h2 className="text-2xl font-bold mb-6">LAM DONG <span className="text-brand-orange">RETAIL</span></h2>
+          <h2 className="text-3xl font-bold mb-0.5">LÂM ĐỒNG</h2> <h3 className="text-lg font-bold mb-2"><span className="text-brand-orange">CỬA HÀNG BÁN LẺ</span></h3>
           <p className="text-blue-100 text-sm mb-6 leading-relaxed">
             Cửa hàng tạp hóa hiện đại, cung cấp thực phẩm sạch và các gói sản phẩm thông minh giúp bạn tiết kiệm chi phí sinh hoạt hàng ngày.
           </p>
@@ -48,7 +48,6 @@ export default function Footer() {
           <ul className="space-y-3 text-sm text-blue-100">
             <li><Link href="/dangnhap" className="hover:text-brand-orange transition">Đăng nhập</Link></li>
             <li><Link href="/giohang" className="hover:text-brand-orange transition">Giỏ hàng</Link></li>
-            <li><Link href="/wishlist" className="hover:text-brand-orange transition">Danh sách yêu thích</Link></li>
             <li><Link href="/track" className="hover:text-brand-orange transition">Theo dõi đơn hàng</Link></li>
           </ul>
         </div>
@@ -62,22 +61,18 @@ export default function Footer() {
            <ul className="space-y-4 text-sm text-blue-100">
              <li className="flex items-start gap-3">
                <MapPin className="w-5 h-5 text-brand-orange flex-shrink-0" />
-               <span>123 Đường Hùng Vương, Phường 9, TP. Đà Lạt, Lâm Đồng</span>
+               <span>50 Phan Đình Phùng, Phường Xuân Hương - Đà Lạt, Tỉnh Lâm Đồng, Việt Nam</span>
              </li>
              <li className="flex items-center gap-3">
                <Phone className="w-5 h-5 text-brand-orange flex-shrink-0" />
-               <span>0912 345 678</span>
+               <span>02633 828 082</span>
              </li>
              <li className="flex items-center gap-3">
                <Mail className="w-5 h-5 text-brand-orange flex-shrink-0" />
-               <span>support@lamdongretail.com</span>
+               <span>lamdongtrading.co@gmail.com</span>
              </li>
            </ul>
         </div>
-      </div>
-      
-      <div className="border-t border-blue-800 pt-8 text-center text-xs text-blue-300">
-        &copy; 2026 Lam Dong Retail Store. Thiết kế bởi Hyen.
       </div>
     </footer>
   );

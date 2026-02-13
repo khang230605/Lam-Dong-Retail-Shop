@@ -86,7 +86,7 @@ export default function Header() {
             {/* LOGO */}
             <Link href="/" className="text-2xl md:text-3xl font-extrabold tracking-tighter flex flex-col leading-none">
               <span>LÂM ĐỒNG</span>
-              <span className="text-xs md:text-sm font-bold text-brand-white tracking-widest">CỬA HÀNG BÁN LẺ</span>
+              <span className="text-xs md:text-sm font-bold text-brand-orange tracking-widest">CỬA HÀNG BÁN LẺ</span>
             </Link>
 
             {/* ACTIONS */}
@@ -96,8 +96,8 @@ export default function Header() {
                        <Phone className="w-5 h-5 text-brand-orange" />
                    </div>
                    <div>
-                       <p className="text-white text-lg font-bold leading-none">1900 888</p>
-                       <p className="text-[10px] text-gray-300">Hỗ trợ 24/7</p>
+                       <p className="text-white text-lg font-bold leading-none">1900 2222</p>
+                       <p className="text-[10px] text-gray-300"></p>
                    </div>
                </div>
 
