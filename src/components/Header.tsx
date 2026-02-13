@@ -81,7 +81,7 @@ export default function Header() {
       {/* TẦNG 1: TOP BAR (Giữ nguyên) */}
       <div className="hidden md:block bg-brand-blue border-b border-blue-800 text-white text-xs py-2">
         <div className="container mx-auto px-4 flex justify-between items-center">
-          <span>Chào mừng đến với Lâm Đồng Retail Store!</span>
+          <span>Chào mừng đến với Lâm Đồng Retail!!!</span>
           <div className="flex gap-4">
              <Link href="/hotro" className="hover:text-brand-orange transition-colors">Hỗ trợ</Link>
           </div>
