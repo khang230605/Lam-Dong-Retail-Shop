@@ -85,8 +85,8 @@ export default function Header() {
             
             {/* LOGO */}
             <Link href="/" className="text-2xl md:text-3xl font-extrabold tracking-tighter flex flex-col leading-none">
-              <span>LAM DONG</span>
-              <span className="text-xs md:text-sm font-normal text-brand-orange tracking-widest">RETAIL STORE</span>
+              <span>LÂM ĐỒNG</span>
+              <span className="text-xs md:text-sm font-bold text-brand-white tracking-widest">CỬA HÀNG BÁN LẺ</span>
             </Link>
 
             {/* ACTIONS */}
