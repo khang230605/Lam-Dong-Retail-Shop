@@ -4,7 +4,14 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/utils/supabase';
 import { formatCurrency } from '@/utils/format';
-import { Package, User, LogOut, Loader2, MapPin, Clock } from 'lucide-react';
+import { Package, User, LogOut, Loader2, Clock } from 'lucide-react';
+
+// Hàm xử lý ảnh
+const getImageUrl = (path: string | null | undefined) => {
+  if (!path) return "https://placehold.co/100?text=IMG";
+  if (path.startsWith('http')) return path;
+  return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${path}`;
+};
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -14,21 +21,27 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      // 1. Lấy thông tin User
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
-        router.push('/dangnhap'); // Chưa đăng nhập thì đá về
+        router.push('/dangnhap'); 
         return;
       }
       setUser(user);
 
-      // 2. Lấy danh sách đơn hàng của User này (sắp xếp mới nhất lên đầu)
+      // --- SỬA QUERY TẠI ĐÂY ---
+      // Lấy thêm thông tin từ bảng 'bundles'
       const { data: ordersData, error } = await supabase
         .from('orders')
         .select(`
           *,
-          items:order_items(*)
+          items:order_items (
+            *,
+            variant:product_variants (
+               product:products ( image_url ) 
+            ),
+            bundle:bundles ( image_url, name ) 
+          )
         `)
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
@@ -45,13 +58,10 @@ export default function ProfilePage() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    // 1. Refresh để Header nhận biết sự kiện SIGNED_OUT nhanh hơn
     router.refresh(); 
-    // 2. Đá về trang chủ
     router.push('/');
   };
 
-  // Helper: Màu sắc trạng thái đơn hàng
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
@@ -63,7 +73,6 @@ export default function ProfilePage() {
     }
   };
 
-  // Helper: Dịch trạng thái sang tiếng Việt
   const getStatusText = (status: string) => {
     const map: any = {
       pending: 'Chờ xử lý',
@@ -102,12 +111,6 @@ export default function ProfilePage() {
                  <button className="w-full flex items-center gap-3 px-4 py-3 bg-blue-50 text-brand-blue rounded-xl font-bold">
                     <Package className="w-5 h-5" /> Đơn hàng của tôi
                  </button>
-                 {/* <button className="w-full flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition">
-                    <User className="w-5 h-5" /> Thông tin tài khoản
-                 </button>
-                 <button className="w-full flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition">
-                    <MapPin className="w-5 h-5" /> Sổ địa chỉ
-                 </button> */}
                  <hr className="my-2"/>
                  <button 
                     onClick={handleLogout}
@@ -153,20 +156,36 @@ export default function ProfilePage() {
 
                       {/* Danh sách sản phẩm trong đơn */}
                       <div className="p-6">
-                         {order.items.map((item: any) => (
-                           <div key={item.id} className="flex justify-between items-center py-2 border-b last:border-0 border-gray-50">
-                              <div className="flex items-center gap-4">
-                                 <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-xs text-gray-400">IMG</div>
-                                 <div>
-                                    <p className="font-medium text-gray-800">{item.product_name}</p>
-                                    <p className="text-xs text-gray-500">x{item.quantity}</p>
-                                 </div>
-                              </div>
-                              <div className="font-bold text-gray-700">
-                                 {formatCurrency(item.price * item.quantity)}
-                              </div>
-                           </div>
-                         ))}
+                         {order.items.map((item: any) => {
+                           
+                           // --- LOGIC LẤY ẢNH MỚI ---
+                           // Ưu tiên ảnh bundle, nếu không có thì lấy ảnh product
+                           const imgPath = item.bundle?.image_url || item.variant?.product?.image_url;
+                           
+                           // Tên hiển thị (đề phòng product_name trong order_items bị lỗi)
+                           const displayName = item.product_name || item.bundle?.name || "Sản phẩm";
+
+                           return (
+                             <div key={item.id} className="flex justify-between items-center py-2 border-b last:border-0 border-gray-50">
+                                <div className="flex items-center gap-4">
+                                   <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden border border-gray-200 flex-shrink-0">
+                                      <img 
+                                        src={getImageUrl(imgPath)} 
+                                        alt={displayName}
+                                        className="w-full h-full object-cover"
+                                      />
+                                   </div>
+                                   <div>
+                                      <p className="font-medium text-gray-800 line-clamp-1">{displayName}</p>
+                                      <p className="text-xs text-gray-500">x{item.quantity}</p>
+                                   </div>
+                                </div>
+                                <div className="font-bold text-gray-700 whitespace-nowrap ml-4">
+                                    {formatCurrency(item.price * item.quantity)}
+                                </div>
+                             </div>
+                           );
+                         })}
                       </div>
 
                       {/* Footer đơn hàng */}

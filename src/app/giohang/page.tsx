@@ -5,11 +5,17 @@ import { useCart, CartItem } from '@/context/CartContext';
 import { formatCurrency } from '@/utils/format';
 import { Trash2, Minus, Plus, ArrowLeft, ArrowRight, ShoppingBag, Package } from 'lucide-react';
 
+// 1. Thêm hàm xử lý ảnh
+const getImageUrl = (path: string | null | undefined) => {
+  if (!path) return "https://placehold.co/100?text=No+Image";
+  if (path.startsWith('http')) return path;
+  return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${path}`;
+};
+
 export default function CartPage() {
   const { items, updateQuantity, removeFromCart, clearCart, totalPrice } = useCart();
 
   if (items.length === 0) {
-    // ... (Giữ nguyên giao diện giỏ trống) ...
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
             <div className="bg-white p-8 rounded-3xl shadow-lg text-center max-w-md w-full">
@@ -49,7 +55,8 @@ export default function CartPage() {
                        </div>
 
                        <div className="w-24 h-24 bg-gray-50 rounded-xl flex-shrink-0 border overflow-hidden">
-                          <img src={bundle.image_url} className="w-full h-full object-cover" />
+                          {/* SỬA SRC ẢNH BUNDLE */}
+                          <img src={getImageUrl(bundle.image_url)} className="w-full h-full object-cover" />
                        </div>
 
                        <div className="flex-1 min-w-0 pt-2 md:pt-0">
@@ -90,7 +97,8 @@ export default function CartPage() {
               return (
                 <div key={`prod-${index}`} className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row items-start md:items-center gap-4">
                   <div className="w-24 h-24 bg-gray-50 rounded-xl flex-shrink-0 border overflow-hidden">
-                    <img src={product.image_url} className="w-full h-full object-cover" />
+                    {/* SỬA SRC ẢNH PRODUCT */}
+                    <img src={getImageUrl(product.image_url)} className="w-full h-full object-cover" />
                   </div>
 
                   <div className="flex-1 min-w-0">
@@ -105,15 +113,15 @@ export default function CartPage() {
                   </div>
 
                   <div className="flex items-center gap-4 ml-auto">
-                     <div className="font-bold text-gray-700 w-24 text-right">
-                        {formatCurrency(variant.price)}
-                     </div>
-                     <div className="flex items-center border rounded-full h-9">
-                        <button onClick={() => updateQuantity(index, item.quantity - 1)} className="w-8 h-full hover:bg-gray-100 rounded-l-full"><Minus className="w-4 h-4 mx-auto"/></button>
-                        <span className="w-8 text-center text-sm font-bold">{item.quantity}</span>
-                        <button onClick={() => updateQuantity(index, item.quantity + 1)} className="w-8 h-full hover:bg-gray-100 rounded-r-full"><Plus className="w-4 h-4 mx-auto"/></button>
-                     </div>
-                     <button onClick={() => removeFromCart(index)} className="text-gray-400 hover:text-red-500"><Trash2 className="w-5 h-5"/></button>
+                      <div className="font-bold text-gray-700 w-24 text-right">
+                         {formatCurrency(variant.price)}
+                      </div>
+                      <div className="flex items-center border rounded-full h-9">
+                         <button onClick={() => updateQuantity(index, item.quantity - 1)} className="w-8 h-full hover:bg-gray-100 rounded-l-full"><Minus className="w-4 h-4 mx-auto"/></button>
+                         <span className="w-8 text-center text-sm font-bold">{item.quantity}</span>
+                         <button onClick={() => updateQuantity(index, item.quantity + 1)} className="w-8 h-full hover:bg-gray-100 rounded-r-full"><Plus className="w-4 h-4 mx-auto"/></button>
+                      </div>
+                      <button onClick={() => removeFromCart(index)} className="text-gray-400 hover:text-red-500"><Trash2 className="w-5 h-5"/></button>
                   </div>
                 </div>
               );
