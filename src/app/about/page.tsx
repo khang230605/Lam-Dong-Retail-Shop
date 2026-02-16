@@ -24,7 +24,7 @@ export default function AboutPage() {
             <h1 className="text-3xl md:text-5xl font-extrabold text-brand-blue leading-tight">
             TẤT CẢ NHU YẾU PHẨM
             {/* Thay đổi ở đây: Thêm 'block' và 'mt-4' (hoặc số khác tùy ý) */}
-            <span className="text-brand-orange block mt-2">
+            <span className="text-brand-orange block mt-2 text-2xl md:text-5xl">
                 CHỈ TRONG MỘT CỬA HÀNG
             </span>
             </h1>
@@ -128,7 +128,7 @@ export default function AboutPage() {
            <div className="order-1 lg:order-2 space-y-6">
               <h2 className="text-3xl font-extrabold text-gray-800 leading-tight">
                   CÙNG NHAU XÂY DỰNG <br/>
-                  <span className="text-green-600">LỐI SỐNG TIẾT KIỆM & BỀN VỮNG</span>
+                  <span className="text-green-600 text-2xl md:text-4xl">LỐI SỐNG TIẾT KIỆM & BỀN VỮNG</span>
               </h2>
               <p className="text-gray-600 leading-relaxed text-justify">
                   Chúng tôi tin rằng mua sắm không chỉ là tiêu dùng, mà còn là cách mỗi người lựa chọn phong cách sống của mình.
