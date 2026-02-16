@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, use } from 'react'; // 1. Thêm import 'use'
+import { useEffect, useState, use } from 'react';
 import { BundleService } from '@/services/BundleService';
 import { useCart } from '@/context/CartContext';
 import { formatCurrency } from '@/utils/format';
@@ -8,24 +8,24 @@ import { ShoppingBag, ArrowLeft, CheckCircle2, Package, Loader2 } from 'lucide-r
 import { notFound, useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-// 2. Định nghĩa lại kiểu Props cho đúng chuẩn Next.js 15 (params là Promise)
+// --- THÊM HÀM XỬ LÝ ẢNH ---
+const getImageUrl = (path: string | null | undefined) => {
+  if (!path) return "https://placehold.co/800x400?text=No+Image";
+  if (path.startsWith('http')) return path;
+  return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${path}`;
+};
+
 export default function BundleDetailPage({ params }: { params: Promise<{ slug: string }> }) {
-  // 3. Dùng use() để lấy slug từ Promise
   const { slug } = use(params);
-  const { addBundleToCart } = useCart(); // Lấy hàm mới
-  const router = useRouter();
-  const { addToCart } = useCart();
+  const { addBundleToCart } = useCart();
   const [bundle, setBundle] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      // 4. Dùng biến 'slug' đã unwrap thay vì params.slug
       const data = await BundleService.getBundleBySlug(slug);
-      
       if (!data) {
-        // Xử lý nếu không tìm thấy bundle (tránh lỗi crash)
         setLoading(false);
         return; 
       }
@@ -33,16 +33,14 @@ export default function BundleDetailPage({ params }: { params: Promise<{ slug: s
       setLoading(false);
     };
     fetchData();
-  }, [slug]); // 5. Dependency là slug
+  }, [slug]);
 
   if (loading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin text-brand-orange"/></div>;
   if (!bundle) return notFound();
 
-  // LOGIC MỚI: Thêm nguyên cục Bundle vào giỏ
   const handleAddBundleToCart = () => {
     addBundleToCart(bundle);
     alert(`Đã thêm gói "${bundle.name}" vào giỏ hàng!`);
-    // Có thể router.push('/giohang') nếu muốn chuyển trang luôn
   };
 
   const savings = bundle.original_price - bundle.price;
@@ -51,24 +49,24 @@ export default function BundleDetailPage({ params }: { params: Promise<{ slug: s
   return (
     <main className="min-h-screen bg-gray-50 pb-20">
       
-      {/* 1. HERO SECTION */}
+      {/* HERO SECTION */}
       <div className="relative bg-gray-900 text-white">
          <div className="absolute inset-0 overflow-hidden opacity-40">
-            <img src={bundle.image_url} className="w-full h-full object-cover blur-sm" />
+            {/* SỬA SRC */}
+            <img src={getImageUrl(bundle.image_url)} className="w-full h-full object-cover blur-sm" />
          </div>
          
          <div className="relative container mx-auto px-4 py-12 md:py-20 flex flex-col md:flex-row items-center gap-8">
-            {/* Ảnh đại diện Combo */}
             <div className="w-full md:w-1/2 max-w-lg">
                <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl border-4 border-white/20">
-                  <img src={bundle.image_url} className="w-full h-full object-cover" />
+                  {/* SỬA SRC */}
+                  <img src={getImageUrl(bundle.image_url)} className="w-full h-full object-cover" />
                   <div className="absolute top-4 left-4 bg-red-600 text-white px-4 py-2 rounded-full font-bold shadow-lg animate-bounce">
                      Tiết kiệm {percent}%
                   </div>
                </div>
             </div>
 
-            {/* Thông tin */}
             <div className="w-full md:w-1/2 space-y-4">
                <Link href="/bundles" className="inline-flex items-center text-gray-300 hover:text-white text-sm mb-2">
                   <ArrowLeft className="w-4 h-4 mr-1" /> Quay lại danh sách
@@ -105,7 +103,7 @@ export default function BundleDetailPage({ params }: { params: Promise<{ slug: s
          </div>
       </div>
 
-      {/* 2. DANH SÁCH MÓN TRONG GÓI */}
+      {/* DANH SÁCH MÓN */}
       <div className="container mx-auto px-4 -mt-8 relative z-10">
          <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-6 md:p-10">
             <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
@@ -116,10 +114,10 @@ export default function BundleDetailPage({ params }: { params: Promise<{ slug: s
                {bundle.items?.map((item: any) => (
                   <div key={item.id} className="flex items-center gap-4 p-4 rounded-2xl border border-gray-100 hover:border-brand-blue/30 hover:bg-blue-50/50 transition bg-gray-50">
                      
-                     {/* Ảnh nhỏ của món */}
                      <div className="w-20 h-20 bg-white rounded-xl flex-shrink-0 overflow-hidden border border-gray-200">
+                        {/* SỬA SRC CHO ITEM CON */}
                         <img 
-                           src={item.variant?.product?.image_url || "https://placehold.co/100"} 
+                           src={getImageUrl(item.variant?.product?.image_url)} 
                            className="w-full h-full object-cover"
                         />
                      </div>
@@ -128,17 +126,16 @@ export default function BundleDetailPage({ params }: { params: Promise<{ slug: s
                         <Link href={`/products/${item.variant?.product?.slug}`} className="font-bold text-gray-800 hover:text-brand-orange truncate block">
                            {item.variant?.product?.name}
                         </Link>
-                        <div className="text-sm text-gray-500 mt-1">
+                        {/* <div className="text-sm text-gray-500 mt-1">
                            Phân loại: <span className="font-medium text-brand-blue">
                               {item.variant?.type === 'new' ? 'Hàng Mới' : 'Cận Date'}
                            </span>
-                        </div>
+                        </div> */}
                         <div className="text-sm text-gray-500">
                            Đơn giá gốc: {formatCurrency(item.variant?.price)}
                         </div>
                      </div>
 
-                     {/* Số lượng */}
                      <div className="flex flex-col items-center justify-center px-4 border-l border-gray-200 pl-4">
                         <span className="text-xs text-gray-400 uppercase font-bold">Số lượng</span>
                         <span className="text-2xl font-extrabold text-brand-orange">x{item.quantity}</span>
@@ -147,7 +144,6 @@ export default function BundleDetailPage({ params }: { params: Promise<{ slug: s
                ))}
             </div>
 
-            {/* Thông báo cam kết */}
             <div className="mt-8 p-4 bg-green-50 rounded-xl border border-green-100 flex items-start gap-3">
                <CheckCircle2 className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
                <div>

@@ -2,33 +2,27 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import Image from 'next/image';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+
+// Import ảnh banner (Đảm bảo bạn đã có file ảnh trong thư mục này)
+import banner1 from './banner/banner1.png'; 
+import banner2 from './banner/banner2.png'; 
+import banner3 from './banner/banner3.png'; 
 
 const BANNERS = [
   {
     id: 1,
-    image: "https://img.freepik.com/free-photo/flat-lay-vegetables-frame_23-2148516757.jpg?w=1380",
-    title: "Thực phẩm tươi ngon",
-    highlight: "Từ nông trại",
-    subtitle: "Cam kết 100% nông sản sạch Đà Lạt. Giao hàng nhanh trong 2h.",
-    link: "/products"
+    image: banner1,
+    link: "/products",
+    alt: "Banner Smart Choice" // Thêm alt để tốt cho SEO
   },
   {
     id: 2,
-    image: "https://img.freepik.com/free-photo/fresh-fruit-stall-market_53876-14682.jpg?w=1380",
-    title: "Đại tiệc trái cây",
-    highlight: "Mùa hè mát lạnh",
-    subtitle: "Giảm giá đến 50% các loại trái cây nhiệt đới. Mua ngay kẻo lỡ!",
-    link: "/products"
+    image: banner2,
+    link: "/bundles/ngay-ngot-ngao",
+    alt: "Banner bundle ngày ngọt ngào"
   },
-  {
-    id: 3,
-    image: "https://img.freepik.com/free-photo/assortment-various-barbecue-food-grill-meat_1150-37728.jpg?w=1380",
-    title: "Combo đồ nướng",
-    highlight: "Cuối tuần vui vẻ",
-    subtitle: "Đầy đủ thịt, rau, nước chấm. Chỉ cần bật bếp là có ngay tiệc ngon.",
-    link: "/bundles"
-  }
 ];
 
 export default function HeroSection() {
@@ -51,60 +45,41 @@ export default function HeroSection() {
   };
 
   return (
-    <section className="container mx-auto px-4 mt-6">
-      {/* Khung chứa chính: overflow-hidden để che các phần bị đẩy ra ngoài */}
-      <div className="relative w-full h-[300px] md:h-[450px] rounded-3xl overflow-hidden shadow-xl group">
+    <section className="container mx-auto px-4 mt-6 max-w-4xl">
+      {/* Khung chứa chính */}
+      <div className="relative w-full aspect-[16/9] rounded-3xl overflow-hidden shadow-xl group">
 
-        {/* --- PHẦN KHÁC BIỆT CHÍNH: THANH TRƯỢT (TRACK) --- */}
-        {/* Chúng ta dùng flex để xếp ảnh hàng ngang và translateX để di chuyển */}
+        {/* --- THANH TRƯỢT (TRACK) --- */}
         <div 
           className="flex h-full transition-transform duration-700 ease-out"
           style={{ transform: `translateX(-${current * 100}%)` }}
         >
-          {BANNERS.map((banner) => (
+          {BANNERS.map((banner, index) => (
             <div 
               key={banner.id} 
-              className="w-full h-full flex-shrink-0 relative" // flex-shrink-0 để ảnh không bị co lại
+              className="w-full h-full flex-shrink-0 relative"
             >
-              {/* 1. ẢNH NỀN */}
-              <img
-                src={banner.image}
-                alt={banner.title}
-                className="w-full h-full object-cover"
-              />
-              
-              {/* 2. LỚP PHỦ ĐEN MỜ */}
-              <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent"></div>
-
-              {/* 3. NỘI DUNG CHỮ */}
-              <div className="absolute inset-0 flex flex-col justify-center px-8 md:px-20 text-white">
-                  <span className="inline-block bg-brand-orange text-white text-xs font-bold px-3 py-1 rounded-full w-fit mb-4">
-                      HOT DEAL
-                  </span>
-                  <h1 className="text-3xl md:text-5xl font-extrabold leading-tight mb-4 max-w-2xl">
-                      {banner.title} <br/>
-                      <span className="text-brand-orange">{banner.highlight}</span>
-                  </h1>
-                  <p className="text-gray-200 text-sm md:text-lg max-w-lg mb-8">
-                      {banner.subtitle}
-                  </p>
-                  
-                  <div className="flex gap-4">
-                      <Link href={banner.link} className="bg-brand-orange hover:bg-orange-600 text-white px-8 py-3 rounded-full font-bold transition flex items-center gap-2 w-fit shadow-lg transform hover:-translate-y-1">
-                          Mua ngay <ArrowRight className="w-5 h-5" />
-                      </Link>
-                  </div>
-              </div>
+              {/* Bọc ảnh trong thẻ Link để click được toàn bộ ảnh */}
+              <Link href={banner.link} className="block w-full h-full relative cursor-pointer">
+                  <Image
+                    src={banner.image}
+                    alt={banner.alt}
+                    fill // Tự động fill đầy khung
+                    className="object-cover" // Giữ tỷ lệ ảnh, cắt bớt phần thừa nếu khung không vừa
+                    priority={index === 0} // Ưu tiên load ảnh đầu
+                    sizes="(max-width: 768px) 100vw, 1200px"
+                  />
+              </Link>
             </div>
           ))}
         </div>
 
-        {/* CÁC NÚT ĐIỀU HƯỚNG (Nằm đè lên trên thanh trượt) */}
+        {/* --- NÚT ĐIỀU HƯỚNG (Vẫn giữ lại để người dùng bấm) --- */}
         
         {/* Nút Trái */}
         <button
             onClick={prevSlide}
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white/20 hover:bg-white text-white hover:text-brand-blue p-2 rounded-full backdrop-blur-sm transition opacity-0 group-hover:opacity-100"
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white/30 hover:bg-white text-white hover:text-brand-orange p-2 rounded-full backdrop-blur-md transition opacity-0 group-hover:opacity-100 shadow-lg border border-white/20"
         >
             <ChevronLeft className="w-8 h-8" />
         </button>
@@ -112,19 +87,19 @@ export default function HeroSection() {
         {/* Nút Phải */}
         <button
             onClick={nextSlide}
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white/20 hover:bg-white text-white hover:text-brand-blue p-2 rounded-full backdrop-blur-sm transition opacity-0 group-hover:opacity-100"
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white/30 hover:bg-white text-white hover:text-brand-orange p-2 rounded-full backdrop-blur-md transition opacity-0 group-hover:opacity-100 shadow-lg border border-white/20"
         >
             <ChevronRight className="w-8 h-8" />
         </button>
 
-        {/* Dấu chấm tròn */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+        {/* Dấu chấm tròn (Indicator) */}
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
             {BANNERS.map((_, index) => (
                 <button
                     key={index}
                     onClick={() => setCurrent(index)}
-                    className={`h-2 rounded-full transition-all duration-300 ${
-                        index === current ? 'bg-brand-orange w-8' : 'bg-white/50 w-2 hover:bg-white'
+                    className={`h-2 rounded-full transition-all duration-300 shadow-sm ${
+                        index === current ? 'bg-brand-orange w-8' : 'bg-white w-2 hover:bg-orange-200'
                     }`}
                 />
             ))}

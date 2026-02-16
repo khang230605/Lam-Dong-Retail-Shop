@@ -4,6 +4,13 @@ import Link from 'next/link';
 import { formatCurrency } from '@/utils/format';
 import { Package, ArrowRight } from 'lucide-react';
 
+// --- THÊM HÀM XỬ LÝ ẢNH ---
+const getImageUrl = (path: string | null | undefined) => {
+  if (!path) return "https://placehold.co/100?text=No+Image";
+  if (path.startsWith('http')) return path;
+  return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${path}`;
+};
+
 export default function MiniBundleCard({ bundle }: { bundle: any }) {
   const savings = bundle.original_price - bundle.price;
   const percent = Math.round((savings / bundle.original_price) * 100);
@@ -12,22 +19,20 @@ export default function MiniBundleCard({ bundle }: { bundle: any }) {
     <Link href={`/bundles/${bundle.slug}`} className="block group">
       <div className="bg-gradient-to-br from-orange-50 to-white border border-orange-200 rounded-xl overflow-hidden hover:shadow-md transition relative">
         
-        {/* Badge nổi bật */}
         <div className="absolute top-0 left-0 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-br-lg z-10 animate-pulse">
           TIẾT KIỆM {percent}%
         </div>
 
         <div className="flex p-3 gap-3 items-center">
-            {/* Ảnh nhỏ */}
             <div className="w-16 h-16 bg-white rounded-lg border border-orange-100 flex-shrink-0 overflow-hidden">
+                {/* SỬA SRC */}
                 <img 
-                    src={bundle.image_url} 
+                    src={getImageUrl(bundle.image_url)} 
                     alt={bundle.name} 
                     className="w-full h-full object-cover group-hover:scale-110 transition"
                 />
             </div>
 
-            {/* Thông tin */}
             <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1 text-[10px] text-orange-600 font-bold uppercase mb-0.5">
                     <Package className="w-3 h-3" /> Combo có món này

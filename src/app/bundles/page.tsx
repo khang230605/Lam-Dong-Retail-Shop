@@ -6,6 +6,13 @@ import { formatCurrency } from '@/utils/format';
 import { Loader2, Package, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
+// --- THÊM HÀM XỬ LÝ ẢNH ---
+const getImageUrl = (path: string | null | undefined) => {
+  if (!path) return "https://placehold.co/600x400?text=No+Image";
+  if (path.startsWith('http')) return path;
+  return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${path}`;
+};
+
 export default function BundlesPage() {
   const [bundles, setBundles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,7 +38,6 @@ export default function BundlesPage() {
     <main className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
         
-        {/* Banner tiêu đề */}
         <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl p-8 mb-8 text-white shadow-lg">
            <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
               <Package className="w-8 h-8" /> Gói Tiết Kiệm (Combos)
@@ -50,17 +56,16 @@ export default function BundlesPage() {
                 const percent = Math.round((savings / bundle.original_price) * 100);
 
                 return (
-                  // SỬA 1: Thay div bằng Link để bấm vào là chuyển trang
                   <Link 
                     key={bundle.id} 
                     href={`/bundles/${bundle.slug}`}
                     className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition group flex flex-col cursor-pointer"
                   >
                     
-                    {/* Ảnh gói */}
                     <div className="relative aspect-video bg-gray-100">
+                       {/* SỬA SRC */}
                        <img 
-                          src={bundle.image_url || "https://placehold.co/600x400"} 
+                          src={getImageUrl(bundle.image_url)} 
                           alt={bundle.name} 
                           className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                        />
@@ -69,7 +74,6 @@ export default function BundlesPage() {
                        </div>
                     </div>
 
-                    {/* Nội dung */}
                     <div className="p-5 flex flex-col flex-1">
                        <h3 className="font-bold text-lg text-gray-800 mb-2 line-clamp-2 group-hover:text-brand-orange transition">
                           {bundle.name}
@@ -101,7 +105,6 @@ export default function BundlesPage() {
                              </p>
                           </div>
                           
-                          {/* SỬA 2: Đổi button thành div để tránh lỗi HTML (button trong a) */}
                           <div className="w-10 h-10 bg-brand-orange text-white rounded-full flex items-center justify-center group-hover:bg-orange-600 transition shadow-lg shadow-orange-200">
                              <ArrowRight className="w-5 h-5" />
                           </div>

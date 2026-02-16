@@ -31,14 +31,7 @@ export default function MegaMenu({ categories }: { categories: Category[] }) {
             </div>
           ))}
 
-          {/* Một cột quảng cáo nhỏ bên phải Mega Menu (Giống Tiki/Shopee hay làm) */}
-          <div className="col-span-1 bg-gray-50 rounded-xl p-4 flex items-center justify-center text-center">
-             <div>
-                <p className="font-bold text-brand-orange mb-2">HOT DEAL 🔥</p>
-                <img src="https://placehold.co/200x150" alt="Promo" className="rounded-lg mb-2 mx-auto"/>
-                <p className="text-xs text-gray-500">Săn sale cuối tuần giảm 50%</p>
-             </div>
-          </div>
+         
 
         </div>
       </div>

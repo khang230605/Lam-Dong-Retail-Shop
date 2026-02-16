@@ -42,6 +42,13 @@ export default function ProductCard({ product }: ProductCardProps) {
     }
   };
 
+  // Hàm hỗ trợ lấy URL ảnh từ Supabase Storage
+    const getImageUrl = (path: string | undefined | null) => {
+  if (!path) return "https://placehold.co/400x400";
+  if (path.startsWith('http')) return path;
+  return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${path}`;
+};
+
   return (
     <Link href={`/products/${product.slug}`} className="group block h-full">
         <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-xl hover:border-brand-orange/30 transition-all duration-300 h-full flex flex-col relative">
@@ -64,7 +71,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                 )}
 
                 <img 
-                    src={product.image_url || "https://placehold.co/400x400?text=No+Image"} 
+                    src={getImageUrl(product.image_url)}
                     alt={product.name}
                     className="w-full h-full object-contain group-hover:scale-110 transition duration-500 ease-in-out mix-blend-multiply"
                 />

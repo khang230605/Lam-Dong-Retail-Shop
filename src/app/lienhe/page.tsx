@@ -152,7 +152,8 @@ export default function ContactPage() {
                        </div>
                        <div>
                           <p className="text-xs opacity-70">Địa chỉ</p>
-                          <p className="font-medium">123 Đường Hùng Vương, Phường 9, TP. Đà Lạt, Lâm Đồng</p>
+                          <p className="font-medium">50 Phan Đình Phùng, Phường Xuân Hương - Đà Lạt, </p>
+                          <p className="font-medium">Tỉnh Lâm Đồng, Việt Nam </p>
                        </div>
                     </div>
 
@@ -162,7 +163,7 @@ export default function ContactPage() {
                        </div>
                        <div>
                           <p className="text-xs opacity-70">Hotline</p>
-                          <p className="font-medium">1900 1234</p>
+                          <p className="font-medium">1900 2222</p>
                        </div>
                     </div>
 
@@ -172,7 +173,7 @@ export default function ContactPage() {
                        </div>
                        <div>
                           <p className="text-xs opacity-70">Email</p>
-                          <p className="font-medium">support@lamdongretail.com</p>
+                          <p className="font-medium">lamdongtrading.co@gmail.com</p>
                        </div>
                     </div>
                  </div>
