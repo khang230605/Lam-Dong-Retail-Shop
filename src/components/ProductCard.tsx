@@ -124,7 +124,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                         */}
                         {nearDateVariant && nearDateVariant.stock_quantity > 0 && (
                              <div className="flex items-center gap-1 text-[10px] text-green-600 font-bold bg-green-50 inline-block px-1.5 py-0.5 rounded border border-green-100 mt-1">
-                                <Clock className="w-3 h-3" /> Có Smart Choice
+                                <Clock className="w-3 h-3" /> Có Smart-Saver
                              </div>
                         )}
                     </div>

@@ -4,7 +4,6 @@ export class BundleService {
   
   // Lấy tất cả gói đang mở bán
   static async getActiveBundles() {
-    // Query này hơi phức tạp: Lấy Bundle -> Lấy Item -> Lấy Variant -> Lấy Product (để lấy tên gốc)
     const { data, error } = await supabase
       .from('bundles')
       .select(`
@@ -14,6 +13,8 @@ export class BundleService {
           variant:product_variants (
             id,
             price,
+            expiry_date,
+            type,
             product:products (
               name,
               image_url
@@ -31,7 +32,7 @@ export class BundleService {
     return data || [];
   }
 
-  // Lấy chi tiết 1 gói theo slug (Dùng cho trang chi tiết gói sau này)
+  // Lấy chi tiết 1 gói theo slug
   static async getBundleBySlug(slug: string) {
     const { data, error } = await supabase
       .from('bundles')
@@ -45,6 +46,7 @@ export class BundleService {
             type,
             price,
             stock_quantity,
+            expiry_date,
             product:products (
               name,
               image_url,
@@ -60,10 +62,9 @@ export class BundleService {
     return data;
   }
 
-  // HÀM MỚI: Tìm các gói Combo có chứa sản phẩm ID X
+  // Lấy các gói Combo có chứa sản phẩm ID X
   static async getBundlesContainingProduct(productId: number) {
     try {
-      // Cách 1: Query trực tiếp (Khó nhưng chuẩn)
       const { data, error } = await supabase
         .from('bundles')
         .select(`
@@ -75,7 +76,7 @@ export class BundleService {
           )
         `)
         .eq('is_active', true)
-        .eq('items.variant.product_id', productId) // Điều kiện lọc cốt lõi
+        .eq('items.variant.product_id', productId)
         .limit(2);
 
       if (error) {
@@ -83,12 +84,11 @@ export class BundleService {
         return [];
       }
       
-      // Nếu không tìm thấy, trả về rỗng
       return data || [];
 
     } catch (err) {
       console.error(err);
       return [];
     }
-}
+  }
 }

@@ -124,17 +124,20 @@ export default function BundleDetailPage({ params }: { params: Promise<{ slug: s
 
                      <div className="flex-1 min-w-0">
                         <Link href={`/products/${item.variant?.product?.slug}`} className="font-bold text-gray-800 hover:text-brand-orange truncate block">
-                           {item.variant?.product?.name}
+                            {item.variant?.product?.name}
                         </Link>
-                        {/* <div className="text-sm text-gray-500 mt-1">
-                           Phân loại: <span className="font-medium text-brand-blue">
-                              {item.variant?.type === 'new' ? 'Hàng Mới' : 'Cận Date'}
-                           </span>
-                        </div> */}
-                        <div className="text-sm text-gray-500">
-                           Đơn giá gốc: {formatCurrency(item.variant?.price)}
+                        
+                        {/* --- THÊM DÒNG HẠN SỬ DỤNG Ở ĐÂY --- */}
+                        {item.variant?.expiry_date && (
+                            <div className="text-xs text-red-600 font-bold mt-1 bg-red-50 inline-block px-2 py-0.5 rounded border border-red-100">
+                                Dùng trước: {new Date(item.variant.expiry_date).toLocaleDateString('vi-VN')}
+                            </div>
+                        )}
+
+                        <div className="text-sm text-gray-500 mt-1">
+                            Đơn giá gốc: {formatCurrency(item.variant?.price)}
                         </div>
-                     </div>
+                    </div>
 
                      <div className="flex flex-col items-center justify-center px-4 border-l border-gray-200 pl-4">
                         <span className="text-xs text-gray-400 uppercase font-bold">Số lượng</span>

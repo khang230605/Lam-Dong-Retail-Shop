@@ -5,7 +5,7 @@ import { ProductService } from '@/services/ProductService';
 import { ReviewService } from '@/services/ReviewService';
 import { useCart } from '@/context/CartContext';
 import { formatCurrency } from '@/utils/format';
-import { ShoppingCart, Clock, ShieldCheck, Star, User, Loader2, ArrowRight } from 'lucide-react'; // Thêm ArrowRight
+import { ShoppingCart, Clock, ShieldCheck, Star, User, Loader2, ArrowRight } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import ProductCard from '@/components/ProductCard';
@@ -110,12 +110,9 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
            <Link href="/">Trang chủ</Link> / <Link href="/products">Sản phẩm</Link> / <span className="text-gray-800 font-bold">{product.name}</span>
         </div>
 
-        {/* 2. THAY ĐỔI LAYOUT Ở ĐÂY: 
-            Dùng grid-cols-4 thay vì grid-cols-3 để chia tỷ lệ 75% - 25% 
-        */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             
-            {/* Cột chính: Chiếm 3/4 (75%) -> Rộng hơn, lấp đầy khoảng trống */}
+            {/* Cột chính: Chiếm 3/4 */}
             <div className="lg:col-span-3 space-y-8">
                 {/* --- KHỐI CHI TIẾT SẢN PHẨM --- */}
                 <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
@@ -152,29 +149,25 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                             <span className="text-gray-400 font-normal">({reviews.length} đánh giá)</span>
                          </div>
                          
-                         {/* SWITCHER SMART CHOICE: Chỉ hiện khi có hàng cận date */}
+                         {/* SWITCHER SMART CHOICE */}
                             {nearDateVariant && (
                                 <div className={`mb-6 p-4 border rounded-xl flex items-center justify-between transition-colors duration-300 ${isSmartChoiceEnabled ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
                                     <div className="flex-1">
                                         <h3 className={`font-bold flex items-center gap-2 ${isSmartChoiceEnabled ? 'text-green-800' : 'text-gray-800'}`}>
                                             {isSmartChoiceEnabled ? <Clock className="w-4 h-4"/> : <ShieldCheck className="w-4 h-4"/>}
-                                            Smart Choice {isSmartChoiceEnabled ? '(Đã bật)' : ''}
+                                            Smart-Saver {isSmartChoiceEnabled ? '(Đã bật)' : ''}
                                         </h3>
+                                        {/* --- ĐÃ SỬA Ở ĐÂY: Hiện thông tin mọi lúc --- */}
                                         <div className="text-sm text-gray-600 mt-1">
-                                            {isSmartChoiceEnabled ? (
-                                                <span>
-                                                    Hạn dùng: <b>{new Date(nearDateVariant.expiry_date).toLocaleDateString('vi-VN')}</b>
-                                                    <br/>
-                                                    Giá sốc: <b className="text-brand-orange text-base">{formatCurrency(nearDateVariant.price)}</b>
-                                                </span>
-                                            ) : (
-                                                "Bật để chọn hàng dùng ngay với giá ưu đãi hơn."
-                                            )}
+                                            <span>
+                                                Dùng trước: <b>{new Date(nearDateVariant.expiry_date).toLocaleDateString('vi-VN')}</b>
+                                                <br/>
+                                                Giá sốc: <b className="text-brand-orange text-base">{formatCurrency(nearDateVariant.price)}</b>
+                                            </span>
                                         </div>
                                     </div>
                                     <button
                                         onClick={handleToggleSmartChoice}
-                                        /* Không cần disable nữa vì nếu không có nearDateVariant thì khối này đã ẩn rồi */
                                         className={`relative w-14 h-8 rounded-full transition-colors duration-300 focus:outline-none flex-shrink-0 ${
                                             isSmartChoiceEnabled ? 'bg-green-500' : 'bg-gray-300'
                                         } cursor-pointer`}
@@ -184,7 +177,6 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                                 </div>
                             )}
 
-                            {/* --- DI CHUYỂN HƯỚNG DẪN SỬ DỤNG LÊN ĐÂY --- */}
                          {/* Chỉ hiện hướng dẫn sử dụng khi BẬT Smart Choice */}
                          {product.usage_instruction && isSmartChoiceEnabled && (
                              <div className="mb-6 bg-blue-50 p-4 rounded-xl border border-blue-100 animate-in fade-in slide-in-from-top-2 duration-300 text-sm">
@@ -286,7 +278,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                 </div>
             </div>
 
-            {/* Cột phải: Chiếm 1/4 (25%) -> Gọn gàng bên phải */}
+            {/* Cột phải: Chiếm 1/4 */}
             <div className="lg:col-span-1">
                 <div className="sticky top-24">
                     {/* BUNDLE */}
@@ -304,7 +296,6 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                     )}
 
                     {/* SẢN PHẨM LIÊN QUAN */}
-                    {/* 3. XÓA các class w-[55%] đi, để nó tự fill hết cột 25% là vừa đẹp */}
                     <div>
                         <h3 className="font-bold text-lg text-gray-800 mb-4 border-l-4 border-brand-orange pl-3">
                             Sản phẩm liên quan
