@@ -162,7 +162,6 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                       </div>
 
                       {/* THÔNG TIN & MUA HÀNG */}
-                      {/* Đã gỡ bỏ z-10 ở đây để Layer Tooltip có thể ngoi lên trên Header */}
                       <div className="p-8 pl-8 md:pl-0 flex flex-col relative">
                          <div className="mb-2">
                             <span className="text-brand-blue font-bold text-xs uppercase tracking-wider bg-blue-50 px-2 py-1 rounded-md">
@@ -182,7 +181,6 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                          
                          {/* SWITCHER SMART CHOICE */}
                          {nearDateVariant && (
-                             // Thêm class 'relative' vào thẻ div ngoài cùng
                              <div className={`relative mb-6 p-4 border rounded-xl flex items-center justify-between transition-colors duration-300 ${isSmartChoiceEnabled ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
                                  
                                  {/* --- ICON INFO & TOOLTIP (GÓC PHẢI TRÊN) --- */}
@@ -200,7 +198,6 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                                      </div>
                                  </div>
 
-                                 {/* Thêm pr-6 để chữ không bị đè vào nút i khi trên màn hình quá nhỏ */}
                                  <div className="flex-1 pr-6">
                                      <h3 className={`font-bold flex items-center gap-2 ${isSmartChoiceEnabled ? 'text-green-800' : 'text-gray-800'}`}>
                                          {isSmartChoiceEnabled ? <Clock className="w-4 h-4"/> : <ShieldCheck className="w-4 h-4"/>}
@@ -227,9 +224,10 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                              </div>
                          )}
 
-                         {/* --- KHỐI GỢI Ý CÔNG THỨC NẤU ĂN --- */}
-                         {product.recipes && (
-                             <div className="mb-6 bg-orange-50 p-4 rounded-xl border border-orange-100">
+                         {/* --- KHỐI GỢI Ý CÔNG THỨC NẤU ĂN (CHỈ HIỆN KHI BẬT SMART SAVER) --- */}
+                         {/* THÊM ĐIỀU KIỆN isSmartChoiceEnabled Ở ĐÂY */}
+                         {product.recipes && isSmartChoiceEnabled && (
+                             <div className="mb-6 bg-orange-50 p-4 rounded-xl border border-orange-100 animate-in fade-in slide-in-from-top-2 duration-300">
                                  <h3 className="font-bold text-brand-orange mb-3 flex items-center gap-2">
                                      <ChefHat className="w-5 h-5" />
                                      {product.recipes.title || "Gợi ý công thức món ngon"}
@@ -246,7 +244,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                                                  <ArrowRight className="w-4 h-4 opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-transform flex-shrink-0" />
                                              </button>
 
-                                             {/* Tooltip Hover (Đã sửa lỗi mất hover khi scroll) */}
+                                             {/* Tooltip Hover */}
                                             <div className="hidden md:block absolute bottom-full left-0 pb-3 w-full min-w-[350px] z-[100] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
                                                 <div className="bg-white border border-gray-200 shadow-2xl rounded-2xl p-5 relative transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
                                                     {/* Mũi tên chĩa xuống */}

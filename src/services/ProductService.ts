@@ -4,34 +4,35 @@ import { Product } from '@/models/types';
 export class ProductService {
   
   // Phương thức 1: Lấy danh sách sản phẩm nổi bật (cho trang Home)
-  static async getDailyFeatured() {
-    try {
-      const { data, error } = await supabase
-        .from('products')
-        .select(`
-          *,
-          variants:product_variants (
-            id,
-            type,
-            price,
-            original_price,
-            stock_quantity
-          )
-        `)
-        .eq('is_featured', true) // Lọc sản phẩm có cờ nổi bật
-        .limit(8); // Lấy tối đa 8 món
+static async getDailyFeatured() {
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .select(`
+        *,
+        variants:product_variants (
+          id,
+          type,
+          price,
+          original_price,
+          stock_quantity
+        )
+      `)
+      .eq('is_featured', true) // Lọc sản phẩm có cờ nổi bật
+      .order('category_id', { ascending: true }); // Sắp xếp theo ID danh mục tăng dần
+      //.limit(8); // Lấy tối đa 8 món (đã comment lại để lấy toàn bộ)
 
-      if (error) {
-        console.error('Lỗi lấy sp nổi bật:', error);
-        return [];
-      }
-      
-      return data || [];
-    } catch (err) {
-      console.error('Exception lấy sp nổi bật:', err);
+    if (error) {
+      console.error('Lỗi lấy sp nổi bật:', error);
       return [];
     }
+    
+    return data || [];
+  } catch (err) {
+    console.error('Exception lấy sp nổi bật:', err);
+    return [];
   }
+}
 
   // Phương thức 2: Lấy tất cả danh mục (cho Mega Menu)
   static async getCategories() {
@@ -163,5 +164,61 @@ export class ProductService {
 
     if (error) return [];
     return data || [];
+  }
+
+  // Phương thức 7: Lấy tất cả sản phẩm có phân trang (cho trang Shop)
+  static async getAllProductsPaginated(page: number = 1, limit: number = 16) {
+    try {
+      const from = (page - 1) * limit;
+      const to = from + limit - 1;
+
+      // Lấy data và tổng số lượng sản phẩm (count: 'exact')
+      const { data, error, count } = await supabase
+        .from('products')
+        .select(`
+          *,
+          variants:product_variants (
+            id,
+            type,
+            price,
+            original_price,
+            stock_quantity
+          )
+        `, { count: 'exact' })
+        .order('created_at', { ascending: false }) // Có thể chỉnh order theo ý bạn
+        .range(from, to);
+
+      if (error) throw error;
+      
+      return {
+        data: data || [],
+        total: count || 0,
+        totalPages: Math.ceil((count || 0) / limit)
+      };
+    } catch (err) {
+      console.error('Lỗi lấy tất cả sản phẩm phân trang:', err);
+      return { data: [], total: 0, totalPages: 0 };
+    }
+  }
+
+  // Phương thức 8: Lấy tất cả sản phẩm 
+  static async getAllProducts() {
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select(`
+          *,
+          variants:product_variants (
+            id, type, price, original_price, stock_quantity
+          )
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    } catch (err) {
+      console.error('Lỗi lấy tất cả sản phẩm:', err);
+      return [];
+    }
   }
 }
