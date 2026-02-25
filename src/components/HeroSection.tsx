@@ -6,9 +6,9 @@ import Image from 'next/image';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 // Import ảnh banner (Đảm bảo bạn đã có file ảnh trong thư mục này)
-import banner1 from './banner/banner1.png'; 
-import banner2 from './banner/banner2.png'; 
-import banner3 from './banner/banner3.png'; 
+import banner1 from './banner/banner1.jpg'; 
+import banner2 from './banner/banner2.jpg'; 
+import banner3 from './banner/banner3.jpg'; 
 
 const BANNERS = [
   {
@@ -23,6 +23,12 @@ const BANNERS = [
     link: "/bundles/ngay-ngot-ngao",
     alt: "Banner bundle ngày ngọt ngào"
   },
+  {
+    id: 3,
+    image: banner3,
+    link: "/lienhe",
+    alt: "B2B Subscription"
+  }
 ];
 
 export default function HeroSection() {

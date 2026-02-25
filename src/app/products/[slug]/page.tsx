@@ -5,7 +5,7 @@ import { ProductService } from '@/services/ProductService';
 import { ReviewService } from '@/services/ReviewService';
 import { useCart } from '@/context/CartContext';
 import { formatCurrency } from '@/utils/format';
-import { ShoppingCart, Clock, ShieldCheck, Star, User, Loader2, ArrowRight } from 'lucide-react';
+import { ShoppingCart, Clock, ShieldCheck, Star, User, Loader2, ArrowRight, ChefHat, X, Info } from 'lucide-react'; 
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import ProductCard from '@/components/ProductCard';
@@ -13,7 +13,6 @@ import { supabase } from '@/utils/supabase';
 import { BundleService } from '@/services/BundleService';
 import MiniBundleCard from '@/components/MiniBundleCard';
 
-// 1. Sửa hàm xử lý ảnh: Chấp nhận null/undefined để tránh lỗi
 const getImageUrl = (path: string | null | undefined) => {
   if (!path) return "https://placehold.co/600x600?text=No+Image";
   if (path.startsWith('http')) return path;
@@ -34,6 +33,8 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
   const [comment, setComment] = useState('');
   const [submittingReview, setSubmittingReview] = useState(false);
   const [selectedType, setSelectedType] = useState<'new' | 'near_date'>('new');
+  
+  const [activeRecipe, setActiveRecipe] = useState<any>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -103,7 +104,38 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 py-8">
+    <main className="min-h-screen bg-gray-50 py-8 relative">
+      
+      {/* --- MODAL CÔNG THỨC CHO MOBILE --- */}
+      {activeRecipe && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:hidden">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setActiveRecipe(null)}></div>
+            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden z-10 animate-scale-up">
+                <div className="bg-brand-orange text-white p-4 pr-12 relative">
+                    <h3 className="font-bold text-lg leading-tight">{activeRecipe.name}</h3>
+                    <button 
+                        onClick={() => setActiveRecipe(null)}
+                        className="absolute top-1/2 -translate-y-1/2 right-4 text-white hover:bg-white/20 rounded-full p-1 transition"
+                    >
+                        <X className="w-5 h-5" />
+                    </button>
+                </div>
+                <div 
+                    className="p-5 max-h-[60vh] overflow-y-auto text-gray-700 whitespace-pre-line leading-relaxed text-sm bg-orange-50/30"
+                    dangerouslySetInnerHTML={{ __html: activeRecipe.instruction }}
+                />
+                <div className="p-4 border-t border-gray-100 bg-white">
+                    <button 
+                        onClick={() => setActiveRecipe(null)}
+                        className="w-full bg-gray-100 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-200 transition"
+                    >
+                        Đóng
+                    </button>
+                </div>
+            </div>
+        </div>
+      )}
+
       <div className="container mx-auto px-4">
         
         <div className="text-sm text-gray-500 mb-6">
@@ -112,13 +144,11 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             
-            {/* Cột chính: Chiếm 3/4 */}
             <div className="lg:col-span-3 space-y-8">
-                {/* --- KHỐI CHI TIẾT SẢN PHẨM --- */}
-                <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="bg-white rounded-3xl shadow-sm border border-gray-100">
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-8">
                       {/* ẢNH */}
-                      <div className="p-8 flex items-center justify-center bg-gray-50 relative min-h-[300px]">
+                      <div className="p-8 flex items-center justify-center bg-gray-50 relative min-h-[300px] rounded-t-3xl md:rounded-l-3xl md:rounded-tr-none">
                          <img 
                             src={getImageUrl(product.image_url)} 
                             alt={product.name} 
@@ -132,7 +162,8 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                       </div>
 
                       {/* THÔNG TIN & MUA HÀNG */}
-                      <div className="p-8 flex flex-col">
+                      {/* Đã gỡ bỏ z-10 ở đây để Layer Tooltip có thể ngoi lên trên Header */}
+                      <div className="p-8 pl-8 md:pl-0 flex flex-col relative">
                          <div className="mb-2">
                             <span className="text-brand-blue font-bold text-xs uppercase tracking-wider bg-blue-50 px-2 py-1 rounded-md">
                                 {product.category?.name || "Sản phẩm"}
@@ -150,41 +181,89 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                          </div>
                          
                          {/* SWITCHER SMART CHOICE */}
-                            {nearDateVariant && (
-                                <div className={`mb-6 p-4 border rounded-xl flex items-center justify-between transition-colors duration-300 ${isSmartChoiceEnabled ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
-                                    <div className="flex-1">
-                                        <h3 className={`font-bold flex items-center gap-2 ${isSmartChoiceEnabled ? 'text-green-800' : 'text-gray-800'}`}>
-                                            {isSmartChoiceEnabled ? <Clock className="w-4 h-4"/> : <ShieldCheck className="w-4 h-4"/>}
-                                            Smart-Saver {isSmartChoiceEnabled ? '(Đã bật)' : ''}
-                                        </h3>
-                                        {/* --- ĐÃ SỬA Ở ĐÂY: Hiện thông tin mọi lúc --- */}
-                                        <div className="text-sm text-gray-600 mt-1">
-                                            <span>
-                                                Dùng trước: <b>{new Date(nearDateVariant.expiry_date).toLocaleDateString('vi-VN')}</b>
-                                                <br/>
-                                                Giá sốc: <b className="text-brand-orange text-base">{formatCurrency(nearDateVariant.price)}</b>
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <button
-                                        onClick={handleToggleSmartChoice}
-                                        className={`relative w-14 h-8 rounded-full transition-colors duration-300 focus:outline-none flex-shrink-0 ${
-                                            isSmartChoiceEnabled ? 'bg-green-500' : 'bg-gray-300'
-                                        } cursor-pointer`}
-                                    >
-                                        <div className={`absolute left-1 top-1 w-6 h-6 bg-white rounded-full shadow-sm transition-transform duration-300 ${isSmartChoiceEnabled ? 'transform translate-x-6' : ''}`} />
-                                    </button>
-                                </div>
-                            )}
+                         {nearDateVariant && (
+                             // Thêm class 'relative' vào thẻ div ngoài cùng
+                             <div className={`relative mb-6 p-4 border rounded-xl flex items-center justify-between transition-colors duration-300 ${isSmartChoiceEnabled ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
+                                 
+                                 {/* --- ICON INFO & TOOLTIP (GÓC PHẢI TRÊN) --- */}
+                                 <div className="absolute top-2.5 right-3 group/info z-20">
+                                     {/* Chữ i */}
+                                     <Info className={`w-4 h-4 cursor-pointer transition-colors ${isSmartChoiceEnabled ? 'text-green-600/70 hover:text-green-800' : 'text-gray-400 hover:text-gray-600'}`} />
+                                     
+                                     {/* Hộp thoại Tooltip hiện ra khi di chuột */}
+                                     <div className="absolute bottom-full right-0 mb-2 w-64 p-3.5 bg-white border border-gray-200 shadow-xl rounded-xl text-xs text-gray-600 leading-relaxed opacity-0 invisible group-hover/info:opacity-100 group-hover/info:visible transition-all duration-300 origin-bottom-right">
+                                         <span className="font-bold text-brand-orange block mb-1">Smart-Saver là gì?</span>
+                                         Hơn cả mức giá hời, Smart Choice giúp bạn khớp nối hoàn hảo giữa hạn bảo quản và thời điểm lên bếp. Mua đúng lúc, dùng đúng chỗ – tối ưu chi tiêu và nói không với lãng phí!
+                                         
+                                         {/* Mũi tên nhỏ chĩa xuống của Tooltip */}
+                                         <div className="absolute -bottom-1.5 right-1 w-3 h-3 bg-white border-b border-r border-gray-200 transform rotate-45"></div>
+                                     </div>
+                                 </div>
 
-                         {/* Chỉ hiện hướng dẫn sử dụng khi BẬT Smart Choice */}
-                         {product.usage_instruction && isSmartChoiceEnabled && (
-                             <div className="mb-6 bg-blue-50 p-4 rounded-xl border border-blue-100 animate-in fade-in slide-in-from-top-2 duration-300 text-sm">
-                                 <h3 className="font-bold text-brand-blue mb-2 flex items-center gap-2">
-                                     📖 Hướng dẫn sử dụng & Bảo quản
+                                 {/* Thêm pr-6 để chữ không bị đè vào nút i khi trên màn hình quá nhỏ */}
+                                 <div className="flex-1 pr-6">
+                                     <h3 className={`font-bold flex items-center gap-2 ${isSmartChoiceEnabled ? 'text-green-800' : 'text-gray-800'}`}>
+                                         {isSmartChoiceEnabled ? <Clock className="w-4 h-4"/> : <ShieldCheck className="w-4 h-4"/>}
+                                         Smart-Saver {isSmartChoiceEnabled ? '(Đã bật)' : ''}
+                                     </h3>
+                                     <div className="text-sm text-gray-600 mt-1">
+                                         <span>
+                                             Dùng trước: <b>{new Date(nearDateVariant.expiry_date).toLocaleDateString('vi-VN')}</b>
+                                             <br/>
+                                             Giá sốc: <b className="text-brand-orange text-base">{formatCurrency(nearDateVariant.price)}</b>
+                                         </span>
+                                     </div>
+                                 </div>
+
+                                 {/* Nút Toggle */}
+                                 <button
+                                     onClick={handleToggleSmartChoice}
+                                     className={`relative w-14 h-8 rounded-full transition-colors duration-300 focus:outline-none flex-shrink-0 ${
+                                         isSmartChoiceEnabled ? 'bg-green-500' : 'bg-gray-300'
+                                     } cursor-pointer`}
+                                 >
+                                     <div className={`absolute left-1 top-1 w-6 h-6 bg-white rounded-full shadow-sm transition-transform duration-300 ${isSmartChoiceEnabled ? 'transform translate-x-6' : ''}`} />
+                                 </button>
+                             </div>
+                         )}
+
+                         {/* --- KHỐI GỢI Ý CÔNG THỨC NẤU ĂN --- */}
+                         {product.recipes && (
+                             <div className="mb-6 bg-orange-50 p-4 rounded-xl border border-orange-100">
+                                 <h3 className="font-bold text-brand-orange mb-3 flex items-center gap-2">
+                                     <ChefHat className="w-5 h-5" />
+                                     {product.recipes.title || "Gợi ý công thức món ngon"}
                                  </h3>
-                                 <div className="text-gray-700 leading-relaxed whitespace-pre-line">
-                                     {product.usage_instruction}
+                                 <div className="flex flex-col gap-2 relative">
+                                     {product.recipes.items?.map((recipe: any, idx: number) => (
+                                         <div key={idx} className="relative group">
+                                             {/* Nút tên món */}
+                                             <button
+                                                 onClick={() => setActiveRecipe(recipe)}
+                                                 className="w-full text-left font-semibold text-gray-700 bg-white px-4 py-3 rounded-lg border border-orange-100 hover:border-brand-orange hover:text-brand-orange transition cursor-pointer flex justify-between items-center shadow-sm"
+                                             >
+                                                 <span className="truncate pr-4">{recipe.name}</span>
+                                                 <ArrowRight className="w-4 h-4 opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-transform flex-shrink-0" />
+                                             </button>
+
+                                             {/* Tooltip Hover (Đã sửa lỗi mất hover khi scroll) */}
+                                            <div className="hidden md:block absolute bottom-full left-0 pb-3 w-full min-w-[350px] z-[100] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+                                                <div className="bg-white border border-gray-200 shadow-2xl rounded-2xl p-5 relative transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                                                    {/* Mũi tên chĩa xuống */}
+                                                    <div className="absolute -bottom-2 left-6 w-4 h-4 bg-white border-b border-r border-gray-200 transform rotate-45"></div>
+                                                    
+                                                    <h4 className="font-bold text-gray-800 mb-2 border-b border-gray-100 pb-2 text-brand-orange">
+                                                        {recipe.name}
+                                                    </h4>
+                                                    {/* Max height và Scrollbar cho công thức dài */}
+                                                    <div 
+                                                        className="text-sm text-gray-600 whitespace-pre-line leading-relaxed max-h-[40vh] overflow-y-auto pr-2"
+                                                        dangerouslySetInnerHTML={{ __html: recipe.instruction }}
+                                                    />
+                                                </div>
+                                            </div>
+                                         </div>
+                                     ))}
                                  </div>
                              </div>
                          )}
@@ -218,6 +297,18 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                    <div className="text-gray-600 leading-relaxed mb-8 whitespace-pre-line">
                        {product.description || "Đang cập nhật mô tả..."}
                    </div>
+
+                   {/* --- KHỐI HDSD ĐƯỢC DỜI XUỐNG ĐÂY --- */}
+                   {product.usage_instruction && (
+                       <div className="mb-10 bg-blue-50 p-6 rounded-2xl border border-blue-100">
+                           <h3 className="font-bold text-brand-blue mb-3 flex items-center gap-2">
+                               📖 Hướng dẫn sử dụng & Bảo quản
+                           </h3>
+                           <div className="text-gray-700 leading-relaxed whitespace-pre-line text-sm md:text-base">
+                               {product.usage_instruction}
+                           </div>
+                       </div>
+                   )}
 
                    <h3 className="font-bold text-xl text-gray-800 mb-6 flex justify-between items-center border-t pt-6">
                        Đánh giá & Nhận xét
