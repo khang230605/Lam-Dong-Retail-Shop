@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { BundleService } from '@/services/BundleService';
 import { formatCurrency } from '@/utils/format';
-import { Loader2, Package, ArrowRight } from 'lucide-react';
+import { Loader2, Package, ArrowRight, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 
 // --- THÊM HÀM XỬ LÝ ẢNH ---
@@ -34,16 +34,57 @@ export default function BundlesPage() {
     );
   }
 
-  return (
+   return (
     <main className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
         
-        <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl p-8 mb-8 text-white shadow-lg">
-           <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
-              <Package className="w-8 h-8" /> Gói Tiết Kiệm (Combos)
-           </h1>
-           <p className="opacity-90">Mua nhiều giảm sâu - Giải pháp thông minh cho bữa ăn gia đình</p>
+        {/* Khai báo hiệu ứng ánh sáng chạy (Shine effect) */}
+        <style>{`
+          @keyframes shine-effect {
+            0% { transform: translateX(-150%) skewX(-15deg); }
+            90% { transform: translateX(300%) skewX(-15deg); }
+            100% { transform: translateX(300%) skewX(-15deg); } /* Giữ thời gian nghỉ để đủ loop 2s */
+          }
+          .animate-shine-effect {
+            animation: shine-effect 2s infinite;
+          }
+        `}</style>
+
+        {/* Banner chính */}
+        <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl p-8 mb-6 text-white shadow-lg relative overflow-hidden">
+           <div className="relative z-10">
+               <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
+                  <Package className="w-8 h-8" /> Gói Tiết Kiệm (Combos)
+               </h1>
+               <p className="opacity-90">Mua nhiều giảm sâu - Giải pháp thông minh cho bữa ăn gia đình</p>
+           </div>
         </div>
+
+        {/* Banner Action: Thiết kế giỏ hàng (Màu xanh brand-blue giữ nguyên) */}
+        <Link 
+            href="/bundles/thietkebundle" 
+            className="block relative overflow-hidden bg-brand-blue rounded-2xl p-8 mb-10 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 group"
+        >
+            {/* Luồng ánh sáng sượt qua (Z-index thấp hơn chữ) */}
+            <div className="absolute top-0 left-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shine-effect pointer-events-none z-0" />
+
+            {/* Nội dung Banner */}
+            <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                <div>
+                    <h2 className="text-2xl md:text-3xl font-bold mb-2 flex items-center gap-3">
+                        <Sparkles className="w-8 h-8 text-yellow-300" /> Thiết kế giỏ hàng Essentials
+                    </h2>
+                    <p className="opacity-90 text-sm md:text-base">
+                        Tiết kiệm lên đến 200k mỗi tháng cho gia đình bạn. Bắt đầu với 3 bước đơn giản!
+                    </p>
+                </div>
+                
+                {/* Nút bấm ảo bên trong banner để kích thích click */}
+                <div className="flex items-center gap-2 bg-white text-brand-blue px-8 py-3.5 rounded-full font-bold shadow-md group-hover:bg-orange-50 transition-colors whitespace-nowrap">
+                    Tạo lộ trình ngay <ArrowRight className="w-5 h-5" />
+                </div>
+            </div>
+        </Link>
 
         {bundles.length === 0 ? (
            <div className="text-center py-12 text-gray-500">

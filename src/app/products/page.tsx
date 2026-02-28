@@ -159,7 +159,7 @@ function ProductContent() {
             <div className="flex justify-center py-12 flex-1"><Loader2 className="animate-spin text-brand-orange w-8 h-8"/></div>
          ) : (
             <>
-                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 flex-1">
+                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
                   {displayProducts.length > 0 ? (
                     displayProducts.map(p => <ProductCard key={p.id} product={p} />)
                   ) : (

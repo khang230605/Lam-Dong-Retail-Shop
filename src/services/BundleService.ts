@@ -91,4 +91,23 @@ export class BundleService {
       return [];
     }
   }
+  
+  // Gửi yêu cầu thiết kế Bundle mới
+  static async submitBundleDesign(data: { name: string; phone: string; selected_categories: string[] }) {
+    try {
+      const { error } = await supabase
+        .from('bundle_design')
+        .insert([{
+            name: data.name,
+            phone: data.phone,
+            selected_categories: data.selected_categories
+        }]);
+
+      if (error) throw error;
+      return true;
+    } catch (err) {
+      console.error('Lỗi gửi yêu cầu thiết kế:', err);
+      throw err;
+    }
+  }
 }
