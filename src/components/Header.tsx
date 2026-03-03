@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/utils/supabase';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
-import { ShoppingCart, User, Search, Menu, Phone, Heart, ChevronDown, X, ChevronRight } from 'lucide-react';
+import { ShoppingCart, User, Search, Menu, Phone, Heart, ChevronDown, X, ChevronRight, Shield } from 'lucide-react';
 import MegaMenu from './MegaMenu';
 import { CategoryService, Category } from '@/services/CategoryService';
 import { useRouter } from 'next/navigation';
@@ -15,9 +15,12 @@ export default function Header() {
   const [user, setUser] = useState<any>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   
-  // 1. STATE ĐIỀU KHIỂN MENU MOBILE
+  // STATE ĐIỀU KHIỂN MENU MOBILE
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [expandedCatId, setExpandedCatId] = useState<number | null>(null);
+
+  // THÊM: STATE KIỂM TRA QUYỀN ADMIN
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const fetchCats = async () => {
@@ -29,26 +32,54 @@ export default function Header() {
   
   useEffect(() => {
     // Hàm lấy user hiện tại (chạy 1 lần đầu)
-    const getUser = async () => {
+    const getUserAndCheckRole = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      setUser(session?.user ?? null);
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
+
+      // Nếu có user, kiểm tra xem có phải Admin không
+      if (currentUser) {
+          const { data: profile } = await supabase
+              .from('profiles')
+              .select('role')
+              .eq('id', currentUser.id)
+              .single();
+          
+          if (profile?.role === 'admin') {
+              setIsAdmin(true);
+          } else {
+              setIsAdmin(false);
+          }
+      } else {
+          setIsAdmin(false); // Reset khi không có user
+      }
     };
-    getUser();
+    getUserAndCheckRole();
 
     // ĐẶT ĂNG-TEN LẮNG NGHE (Listener)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      // Khi có sự kiện Đăng nhập, Đăng xuất, hay thay đổi User...
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
         setUser(session?.user);
-        router.refresh(); // Refresh nhẹ để các Server Component cập nhật theo
+        
+        // Cập nhật lại quyền Admin khi đăng nhập thành công
+        if (session?.user) {
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('role')
+                .eq('id', session.user.id)
+                .single();
+            setIsAdmin(profile?.role === 'admin');
+        }
+
+        router.refresh(); 
       } 
       else if (event === 'SIGNED_OUT') {
         setUser(null);
+        setIsAdmin(false); // Xóa quyền admin khi đăng xuất
         router.refresh();
       }
     });
 
-    // Dọn dẹp ăng-ten khi component bị hủy (tránh rò rỉ bộ nhớ)
     return () => {
       subscription.unsubscribe();
     };
@@ -62,32 +93,59 @@ export default function Header() {
   // Hàm xử lý tìm kiếm
   const handleSearch = () => {
     if (searchQuery.trim()) {
-      // Chuyển hướng sang trang products kèm tham số search
       router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
     }
   };
 
-  // Hàm xử lý khi bấm phím Enter
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleSearch();
     }
   };
 
+  // Hàm xử lý khi bấm nút Admin
+  const handleAdminClick = (e: React.MouseEvent) => {
+    e.preventDefault(); // Ngăn chặn thẻ <a> F5 ngay lập tức
+    setIsMobileMenuOpen(false); // Tự động đóng menu trên mobile (nếu đang mở)
+    
+    // 1. Chuyển sang trang admin ngay lập tức bằng Next.js Router (không load lại trang)
+    router.push('/admin');
+
+    // 2. Hẹn giờ đúng 2000ms (2 giây) sau đó ép trình duyệt F5 (Hard Reload)
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
+  };
+
   return (
     <>
     <header className="sticky top-0 z-50 bg-white shadow-md">
 
-      {/* TẦNG 2: MAIN HEADER (Giữ nguyên) */}
+      {/* TẦNG 2: MAIN HEADER */}
       <div className="bg-brand-blue text-white py-3 md:py-4 shadow-lg">
         <div className="container mx-auto px-4">
           <div className="flex flex-wrap md:flex-nowrap items-center justify-between gap-4">
             
-            {/* LOGO */}
-            <Link href="/" className="text-2xl md:text-3xl font-extrabold tracking-tighter flex flex-col leading-none">
-              <span>LÂM ĐỒNG</span>
-              <span className="text-xs md:text-sm font-bold text-brand-orange tracking-widest">CỬA HÀNG BÁN LẺ</span>
-            </Link>
+            {/* LOGO & ADMIN BUTTON */}
+            <div className="flex items-center gap-2 md:gap-4">
+                <Link href="/" className="text-2xl md:text-3xl font-extrabold tracking-tighter flex flex-col leading-none">
+                  <span>LÂM ĐỒNG</span>
+                  <span className="text-[10px] md:text-sm font-bold text-brand-orange tracking-widest">CỬA HÀNG BÁN LẺ</span>
+                </Link>
+
+                {/* --- NÚT ADMIN PANEL (Đã hiển thị trên Mobile) --- */}
+                {isAdmin && (
+                  <a 
+                    href="/admin" 
+                    onClick={handleAdminClick} /* Thêm sự kiện onClick mới ở đây */
+                    className="flex items-center justify-center w-8 h-8 md:w-auto md:h-auto md:px-3 md:py-1.5 bg-white/10 border border-white/20 rounded-lg text-sm font-bold text-white hover:bg-brand-orange hover:border-brand-orange transition-all duration-300 shadow-sm cursor-pointer"
+                    title="Vào trang quản trị"
+                  >
+                    <Shield className="w-4 h-4 md:w-4 md:h-4 text-brand-orange" />
+                    <span className="hidden md:inline-block ml-1.5">Trang Quản Trị</span>
+                  </a>
+                )}
+            </div>
 
             {/* ACTIONS */}
             <div className="flex items-center gap-4 md:gap-6 ml-auto md:ml-0 md:order-3">
@@ -103,7 +161,6 @@ export default function Header() {
 
                <div className="flex items-center gap-3 md:gap-5">
                    
-
                    <Link href="/giohang" className="relative group">
                        <ShoppingCart className="w-6 h-6 md:w-7 md:h-7 group-hover:text-brand-orange transition-colors" />
                        {totalItems > 0 && (
@@ -170,14 +227,12 @@ export default function Header() {
                 <Link href="/" className="hover:text-brand-blue text-brand-blue">Trang chủ</Link>
             </li>
             
-            {/* --- MỤC SẢN PHẨM ĐÃ SỬA --- */}
+            {/* --- MỤC SẢN PHẨM --- */}
             <li className="group static flex-shrink-0 flex items-center"> 
-                {/* 1. Link text: Bấm vào là đi đến trang sản phẩm */}
                 <Link href="/products" className="hover:text-brand-blue py-3 block">
                     Sản phẩm
                 </Link>
 
-                {/* 2. Nút mũi tên MOBILE: Bấm vào là mở Menu Overlay */}
                 <button 
                     onClick={() => setIsMobileMenuOpen(true)}
                     className="md:hidden p-2 ml-1 text-gray-500 hover:text-brand-orange"
@@ -185,15 +240,12 @@ export default function Header() {
                     <ChevronDown className="w-4 h-4"/>
                 </button>
 
-                {/* 3. Icon mũi tên PC: Chỉ để trang trí, hiện khi hover */}
                 <ChevronDown className="w-3 h-3 hidden md:block ml-1"/>
                 
-                {/* 4. Mega Menu PC (Vẫn giữ nguyên logic hover cũ) */}
                 <div className="hidden md:block">
                     <MegaMenu categories={categories} />
                 </div>
             </li>
-            {/* --------------------------- */}
             
             <li className="flex-shrink-0">
                 <Link href="/bundles" className="text-brand-orange hover:text-orange-700 flex items-center gap-1">
@@ -214,7 +266,6 @@ export default function Header() {
                     Liên hệ
                 </Link>
             </li>
-            
 
           </ul>
         </div>
@@ -224,7 +275,7 @@ export default function Header() {
     {/* --- MOBILE MENU OVERLAY (LỚP PHỦ) --- */}
     {isMobileMenuOpen && (
         <div className="fixed inset-0 z-[60] bg-black/50 md:hidden animate-fade-in">
-            {/* Nội dung Menu trượt từ trái sang (hoặc dưới lên) */}
+            {/* Nội dung Menu trượt từ trái sang */}
             <div className="absolute inset-y-0 left-0 w-[80%] bg-white flex flex-col shadow-2xl animate-slide-in-left">
                 
                 {/* Header Menu Mobile */}
@@ -239,6 +290,20 @@ export default function Header() {
 
                 {/* Body Menu Mobile */}
                 <div className="flex-1 overflow-y-auto bg-gray-50 p-4">
+                    {/* Thêm nút Admin vào Menu Mobile nếu là Admin */}
+                    {isAdmin && (
+                        <div className="mb-4">
+                            <a 
+                                href="/admin"
+                                onClick={handleAdminClick} /* Thay thế onClick cũ bằng hàm mới */
+                                className="flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-brand-blue to-blue-600 text-white font-bold rounded-xl shadow-md cursor-pointer"
+                            >
+                                <Shield className="w-5 h-5 text-brand-orange" />
+                                Vào Trang Quản Trị
+                            </a>
+                        </div>
+                    )}
+
                     {categories.map((parent) => (
                         <div key={parent.id} className="mb-3 bg-white rounded-xl border border-gray-100 overflow-hidden">
                             {/* Cha */}
