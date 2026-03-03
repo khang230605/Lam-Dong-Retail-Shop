@@ -9,6 +9,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import banner1 from './banner/banner1.jpg'; 
 import banner2 from './banner/banner2.jpg'; 
 import banner3 from './banner/banner3.jpg'; 
+import banner4 from './banner/banner4.jpg';
 
 const BANNERS = [
   {
@@ -28,6 +29,12 @@ const BANNERS = [
     image: banner3,
     link: "/lienhe",
     alt: "B2B Subscription"
+  },
+  {
+    id: 4,
+    image: banner4,
+    link: "/bundles/thietkebundle",
+    alt: "Banner Thiet Ke Bundle"
   }
 ];
 
