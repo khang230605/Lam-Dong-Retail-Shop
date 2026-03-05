@@ -1,7 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
-import { ShoppingCart, Star, Plus, Clock } from 'lucide-react'; // Thêm icon Clock
+import { ShoppingCart, Star, Plus, Clock, CheckCircle2 } from 'lucide-react'; // Thêm icon Clock
 import { Product } from '@/models/types';
 import { formatCurrency } from '@/utils/format';
 import { useCart } from '@/context/CartContext';
@@ -13,6 +14,8 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
   
+  const [showToast, setShowToast] = useState(false);
+
   const variants = product.variants || [];
 
   // --- LOGIC MỚI: ƯU TIÊN HIỂN THỊ GIÁ HÀNG MỚI ---
@@ -39,6 +42,10 @@ export default function ProductCard({ product }: ProductCardProps) {
     e.preventDefault();
     if (!isOutOfStock) {
         addToCart(product, displayVariant, 1);
+        
+        // Hiện thông báo và hẹn giờ 2 giây sau tự tắt
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 2000);
     }
   };
 
@@ -50,6 +57,17 @@ export default function ProductCard({ product }: ProductCardProps) {
 };
 
   return (
+    <>
+      {/* 5. Giao diện thông báo nổi (Toast) */}
+      {showToast && (
+        <div className="fixed top-24 right-4 z-[100] bg-green-500 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 animate-fade-in transition-all">
+           <CheckCircle2 className="w-5 h-5 text-white" />
+           <p className="text-sm font-medium">
+             Đã thêm <span className="font-bold">{product.name}</span>
+           </p>
+        </div>
+      )}
+
     <Link href={`/products/${product.slug}`} className="group block h-full">
         <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-xl hover:border-brand-orange/30 transition-all duration-300 h-full flex flex-col relative">
             
@@ -145,5 +163,6 @@ export default function ProductCard({ product }: ProductCardProps) {
             </div>
         </div>
     </Link>
+    </>
   );
 }

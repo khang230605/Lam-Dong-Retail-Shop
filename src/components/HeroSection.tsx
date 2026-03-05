@@ -24,12 +24,12 @@ const BANNERS = [
     link: "/bundles/ngay-ngot-ngao",
     alt: "Banner bundle ngày ngọt ngào"
   },
-  {
-    id: 3,
-    image: banner3,
-    link: "/lienhe",
-    alt: "B2B Subscription"
-  },
+  // {
+  //   id: 3,
+  //   image: banner3,
+  //   link: "/lienhe",
+  //   alt: "B2B Subscription"
+  // },
   {
     id: 4,
     image: banner4,

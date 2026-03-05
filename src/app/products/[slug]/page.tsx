@@ -5,7 +5,7 @@ import { ProductService } from '@/services/ProductService';
 import { ReviewService } from '@/services/ReviewService';
 import { useCart } from '@/context/CartContext';
 import { formatCurrency } from '@/utils/format';
-import { ShoppingCart, Clock, ShieldCheck, Star, User, Loader2, ArrowRight, ChefHat, X, Info } from 'lucide-react'; 
+import { ShoppingCart, Clock, ShieldCheck, Star, User, Loader2, ArrowRight, ChefHat, X, Info, CheckCircle2 } from 'lucide-react'; 
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import ProductCard from '@/components/ProductCard';
@@ -35,6 +35,16 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
   const [selectedType, setSelectedType] = useState<'new' | 'near_date'>('new');
   
   const [activeRecipe, setActiveRecipe] = useState<any>(null);
+
+  const [showToast, setShowToast] = useState(false);
+  // Tạo hàm xử lý bấm nút Thêm
+  const handleAddToCart = () => {
+    if (currentVariant && currentVariant.stock_quantity > 0) {
+      addToCart(product, currentVariant);
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 2000);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -105,6 +115,15 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 
   return (
     <main className="min-h-screen bg-gray-50 py-8 relative">
+      {/* KHỐI THÔNG BÁO THÊM THÀNH CÔNG */}
+      {showToast && (
+        <div className="fixed top-24 right-4 z-[200] bg-green-500 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 animate-fade-in transition-all">
+           <CheckCircle2 className="w-5 h-5 text-white" />
+           <p className="text-sm font-medium">
+             Đã thêm <span className="font-bold">{product.name}</span> vào giỏ!
+           </p>
+        </div>
+      )}
       
       {/* --- MODAL CÔNG THỨC CHO MOBILE --- */}
       {activeRecipe && (
@@ -278,13 +297,13 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                          </div>
 
                          <button 
-                            onClick={() => currentVariant && addToCart(product, currentVariant)}
+                            onClick={handleAddToCart} // Đổi thành gọi hàm mới
                             disabled={!currentVariant || currentVariant.stock_quantity <= 0}
                             className="w-full bg-brand-orange text-white py-3 rounded-xl font-bold text-lg hover:bg-orange-600 transition shadow-lg shadow-orange-200 flex items-center justify-center gap-2 disabled:bg-gray-300 disabled:cursor-not-allowed mt-auto"
-                         >
+                            >
                             <ShoppingCart className="w-5 h-5" />
                             {currentVariant?.stock_quantity > 0 ? 'THÊM VÀO GIỎ' : 'TẠM HẾT HÀNG'}
-                         </button>
+                        </button>
                       </div>
                    </div>
                 </div>
