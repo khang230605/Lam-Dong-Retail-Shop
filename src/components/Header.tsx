@@ -261,11 +261,11 @@ export default function Header() {
                 <Link href="/hotro" className="hover:text-brand-orange transition-colors">Hỗ trợ</Link>
             </li>
             
-            <li className="flex-shrink-0">
+            {/* <li className="flex-shrink-0">
                 <Link href="/lienhe" className="hover:text-brand-orange transition">
                     Liên hệ
                 </Link>
-            </li>
+            </li> */}
 
           </ul>
         </div>
